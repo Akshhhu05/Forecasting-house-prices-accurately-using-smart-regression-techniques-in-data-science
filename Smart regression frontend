@@ -1,0 +1,91 @@
+// App.jsx
+import React, { useState } from "react";
+import axios from "axios";
+
+function App() {
+  const [formData, setFormData] = useState({
+    bedrooms: "",
+    bathrooms: "",
+    sqft: "",
+    location: ""
+  });
+
+  const [prediction, setPrediction] = useState(null);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/predict", formData);
+      setPrediction(res.data.predicted_price);
+    } catch (err) {
+      console.error("Prediction error", err);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md space-y-4"
+      >
+        <h1 className="text-2xl font-bold text-center">House Price Predictor</h1>
+
+        <input
+          type="number"
+          name="bedrooms"
+          placeholder="Bedrooms"
+          value={formData.bedrooms}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+
+        <input
+          type="number"
+          name="bathrooms"
+          placeholder="Bathrooms"
+          value={formData.bathrooms}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+
+        <input
+          type="number"
+          name="sqft"
+          placeholder="Square Footage"
+          value={formData.sqft}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={formData.location}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+
+        <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          Predict Price
+        </button>
+
+        {prediction && (
+          <div className="mt-4 text-center text-xl font-semibold text-green-700">
+            Estimated Price: ${prediction}
+          </div>
+        )}
+      </form>
+    </div>
+  );
+}
+
+export default App;
